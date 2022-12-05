@@ -3,7 +3,85 @@ import { OrbitControls } from 'OrbitControls';
 
 // ===================== PLANETARY DATA ==================
 
+// semi_major for planets is in kilometres * 10^6, for satellites its in kilometres
+// inclination and tilt is in degrees
+// inclination is in reference to the sun's equator
+// radius is in kilometres
 
+// forgot to add spin speed
+
+const mercury = {
+    name: "Mercury",
+    semi_major: 57909050,
+    eccentric: 0.205630,
+    inclination: 3.38,
+    radius: 2440.5,
+    tilt: 0.034,
+    satellites: []
+}
+
+const venus = {
+    name: "Venus",
+    semi_major: 108.210,
+    eccentric: 0.0068,
+    inclination: 3.86,
+    radius: 6051.8,
+    tilt: 2.64,
+    satellites: []
+}
+
+const earth = {
+    name: "Earth",
+    semi_major: 149.598,
+    eccentric: 0.0167,
+    inclination: 7.155,
+    radius: 6378.137,
+    tilt: 23.44,
+    satellites: [{
+        name: "The Moon",
+        semi_major: 0.3844,
+        eccentric: 0.0549,
+        inclination: 23.43,
+        radius: 1738.1,
+        tilt: 6.68,
+    }]
+}
+
+const mars = {
+    name: "Mars",
+    semi_major: 227.956,
+    eccentric: 0.0935,
+    inclination: 5.65,
+    radius: 3396.2,
+    tilt: 25.19,
+    satellites: [
+        {
+        name: "Phobos",
+        semi_major: 9376,
+        eccentric: 0.0151,
+        inclination: 1.093,
+        radius: 11.2667,
+        tilt: 0,
+        },
+        {
+        name: "Deimos",
+        semi_major: 23463.2,
+        eccentric: 0.00033,
+        inclination: 0.93,
+        radius: 6.29,
+        tilt: 0,
+        }
+    ]
+}
+
+// ===================== ORBIT GENERATOR =================
+
+function generateOrbit(a, e, i) {
+    // a is the semi-major axis
+    // e is the eccentricity
+    // i is the inclination
+    const b = a*Math.sqrt(1-e^2);
+}
 
 // ======================= 3D LOGIC =======================
 
