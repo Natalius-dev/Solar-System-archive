@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
+import { InteractionManager  } from 'three.interactive';
 
 // ===================== PLANETARY DATA ==================
 
@@ -9,6 +10,12 @@ import { OrbitControls } from 'OrbitControls';
 // radius is in kilometres
 
 // forgot to add spin speed
+
+const sun = {
+    name: "The Sun",
+    radius: 695700,
+    tilt: 0
+}
 
 const mercury = {
     name: "Mercury",
@@ -74,25 +81,61 @@ const mars = {
     ]
 }
 
-// ===================== ORBIT GENERATOR =================
+// ===================== FUNCTIONS =================
+
+function degrees_to_radians(degrees)
+{
+  var pi = Math.PI;
+  return degrees * (pi/180);
+}
 
 function generateOrbit(a, e, i) {
     // a is the semi-major axis
     // e is the eccentricity
     // i is the inclination
     const b = a*Math.sqrt(1-e^2);
+
+    let path = new THREE.CurvePath();
+    path.autoClose = true;
+
+    path.add(new THREE.Vector3(0,b,0));
+    path.add(new THREE.Vector3(a,0,0));
+    path.add(new THREE.Vector3(0,-b,0));
+    path.add(new THREE.Vector3(-a,0,0));
+
+    return path;
+}
+
+function addBody(texture, body) {
+    const textureMap = new THREE.TextureLoader().load(texture);
+    textureMap.magFilter = THREE.NearestFilter;
+    textureMap.generateMipmaps = false;
+    textureMap.minFilter = THREE.LinearFilter;
+    const obj = new THREE.Mesh(new THREE.SphereGeometry(body.radius/500,64,32), new THREE.MeshStandardMaterial({ map: textureMap }));
+    obj.rotation.z = degrees_to_radians(body.tilt);
+    scene.add(obj);
+
+    interact.add(obj);
+    obj.addEventListener('click', function(){
+        controlTarget = obj.position;
+    });
+
+    return obj;
 }
 
 // ======================= 3D LOGIC =======================
 
 const scene = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 5000);
+const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 10000);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById("graphics")
 });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
+const interact = new InteractionManager(renderer, cam, renderer.domElement);
+
+let controlTarget = new THREE.Vector3();
 const controls = new OrbitControls(cam, renderer.domElement);
 
 cam.position.setZ(90);
@@ -102,35 +145,39 @@ scene.add(gridHelper);
 const axesHelper = new THREE.AxesHelper(50);
 scene.add( axesHelper );
 
-const jupiter = new THREE.Mesh(new THREE.SphereGeometry(15,64,32), new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(
-    "textures/jupiter.jpg"
-) }));
-jupiter.rotation.z = 0.05462881;
-scene.add(jupiter);
+const sunObj = addBody("textures/sun.jpg", sun)
+const sunTextureMap = new THREE.TextureLoader().load("textures/sun.jpg");
+sunTextureMap.magFilter = THREE.NearestFilter;
+sunTextureMap.generateMipmaps = false;
+sunTextureMap.minFilter = THREE.LinearFilter;
+sunObj.material = new THREE.MeshBasicMaterial({map: sunTextureMap});
+const mercuryObj = addBody("textures/mercury.jpg", mercury);
+const venusObj = addBody("textures/venus.jpg", venus);
+const earthObj = addBody("textures/earth.png", earth);
+const marsObj = addBody("textures/mars.jpg", mars);
 
-const light0 = new THREE.AmbientLight("#fff",0.5);
+const light0 = new THREE.AmbientLight("#fff",0.3);
 light0.position.set(-25,15,15);
 scene.add(light0);
 
-const light1 = new THREE.PointLight("#fff",1);
-light1.position.set(25,25,15);
-const light1helper = new THREE.PointLightHelper(light1, 1);
-scene.add(light1);
-scene.add(light1helper);
-
-const light2 = new THREE.PointLight("#fff",1.5);
-light2.position.set(-15,-25,0);
-const light2helper = new THREE.PointLightHelper(light2, 1);
-scene.add(light2);
-scene.add(light2helper);
+const sunLight = new THREE.PointLight("#ffd782",5, 10000);
+sunLight.position.set(-5000,0,0);
+scene.add(sunLight);
 
 
 function animate() {
 	requestAnimationFrame( animate );
 
-    jupiter.rotation.y += 6.28;
+    sunObj.position.setX(-5000);
+    mercuryObj.position.setX(-500);
+    venusObj.position.setX(-300);
+    earthObj.position.setX(0);
+    earthObj.rotateOnAxis(new THREE.Vector3(0,1,0),0.005);
+    marsObj.position.setX(250);
 
+    interact.update();
     controls.update();
+    controls.target.lerp(controlTarget, 0.1);
 	renderer.render( scene, cam );
 }
 animate();
