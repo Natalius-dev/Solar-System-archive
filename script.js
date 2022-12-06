@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { InteractionManager  } from 'three.interactive';
+import { TextureLoader, Vector2 } from 'three';
 
 // ===================== PLANETARY DATA ==================
 
@@ -13,15 +14,15 @@ import { InteractionManager  } from 'three.interactive';
 
 const sun = {
     name: "The Sun",
-    radius: 695700,
-    tilt: 0
+    radius: 695700/5,
+    tilt: 7.25
 }
 
 const mercury = {
     name: "Mercury",
-    semi_major: 57909050,
+    semi_major: 57.909,
     eccentric: 0.205630,
-    inclination: 3.38,
+    inclination: 7.004,
     radius: 2440.5,
     tilt: 0.034,
     satellites: []
@@ -31,9 +32,9 @@ const venus = {
     name: "Venus",
     semi_major: 108.210,
     eccentric: 0.0068,
-    inclination: 3.86,
+    inclination: 3.395,
     radius: 6051.8,
-    tilt: 2.64,
+    tilt: 177.36,
     satellites: []
 }
 
@@ -41,14 +42,14 @@ const earth = {
     name: "Earth",
     semi_major: 149.598,
     eccentric: 0.0167,
-    inclination: 7.155,
+    inclination: 0,
     radius: 6378.137,
     tilt: 23.44,
     satellites: [{
         name: "The Moon",
         semi_major: 0.3844,
         eccentric: 0.0549,
-        inclination: 23.43,
+        inclination: 5.145,
         radius: 1738.1,
         tilt: 6.68,
     }]
@@ -58,7 +59,7 @@ const mars = {
     name: "Mars",
     semi_major: 227.956,
     eccentric: 0.0935,
-    inclination: 5.65,
+    inclination: 1.848,
     radius: 3396.2,
     tilt: 25.19,
     satellites: [
@@ -89,21 +90,30 @@ function degrees_to_radians(degrees)
   return degrees * (pi/180);
 }
 
-function generateOrbit(a, e, i) {
+function generateOrbit(a, e, i, centerX, centerY) {
     // a is the semi-major axis
     // e is the eccentricity
     // i is the inclination
-    const b = a*Math.sqrt(1-e^2);
+    let b = a*(Math.sqrt(1-(Math.pow(e,2))));
 
-    let path = new THREE.CurvePath();
-    path.autoClose = true;
+    let path = new THREE.EllipseCurve(
+        centerX*100, centerY*100,
+        a*100, b*100,
+        0, 2*Math.PI,
+        false,
+        0
+    );
 
-    path.add(new THREE.Vector3(0,b,0));
-    path.add(new THREE.Vector3(a,0,0));
-    path.add(new THREE.Vector3(0,-b,0));
-    path.add(new THREE.Vector3(-a,0,0));
+    let rotationMatrix = new THREE.Matrix4();
+    rotationMatrix.makeRotationAxis(new THREE.Vector3(1,0,0), degrees_to_radians(i+90));
+    let ellipse = path.getPoints(1000);
+    let pathArray = [];
+    let theta = degrees_to_radians(i);
+    for(let i = 0; i < 1000; i++) {
+        pathArray.push(new THREE.Vector2( (ellipse[i].x * Math.cos(theta))-(ellipse[i].y * Math.sin(theta)), (ellipse[i].x * Math.sin(theta))+(ellipse[i].y * Math.cos(theta)) ));
+    }
 
-    return path;
+    return pathArray;
 }
 
 function addBody(texture, body) {
@@ -126,7 +136,7 @@ function addBody(texture, body) {
 // ======================= 3D LOGIC =======================
 
 const scene = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 10000);
+const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 150000);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById("graphics")
 });
@@ -145,16 +155,27 @@ scene.add(gridHelper);
 const axesHelper = new THREE.AxesHelper(50);
 scene.add( axesHelper );
 
-const sunObj = addBody("textures/sun.jpg", sun)
+const skyboxMat = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")});
+skyboxMat.side = THREE.BackSide;
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(100000,100000,100000), skyboxMat));
+
+const sunObj = addBody("textures/sun.jpg", sun);
+sunObj.position.setX(-5000);
 const sunTextureMap = new THREE.TextureLoader().load("textures/sun.jpg");
 sunTextureMap.magFilter = THREE.NearestFilter;
 sunTextureMap.generateMipmaps = false;
 sunTextureMap.minFilter = THREE.LinearFilter;
 sunObj.material = new THREE.MeshBasicMaterial({map: sunTextureMap});
 const mercuryObj = addBody("textures/mercury.jpg", mercury);
+mercuryObj.position.setX(-500);
 const venusObj = addBody("textures/venus.jpg", venus);
+venusObj.position.setX(-300);
 const earthObj = addBody("textures/earth.png", earth);
+earthObj.position.setX(0);
+const moonObj = addBody("textures/moon.jpg", earth.satellites[0]);
+moonObj.position.setZ(50);
 const marsObj = addBody("textures/mars.jpg", mars);
+marsObj.position.setX(250);
 
 const light0 = new THREE.AmbientLight("#fff",0.3);
 light0.position.set(-25,15,15);
@@ -164,16 +185,31 @@ const sunLight = new THREE.PointLight("#ffd782",5, 10000);
 sunLight.position.set(-5000,0,0);
 scene.add(sunLight);
 
+scene.add( new THREE.Mesh(new THREE.BufferGeometry().setFromPoints( generateOrbit(earth.satellites[0].semi_major,earth.satellites[0].eccentric,earth.satellites[0].inclination,0,0) ).rotateX(degrees_to_radians(earth.satellites[0].inclination-90)), new THREE.MeshBasicMaterial({color:"#fff"}) ));
+const moonOrbit = generateOrbit(earth.satellites[0].semi_major,earth.satellites[0].eccentric,earth.satellites[0].inclination,0,0);
+
+let moonOrbitIndex = 0;
 
 function animate() {
-	requestAnimationFrame( animate );
+    if(moonOrbitIndex > 999){
+        moonOrbitIndex = 0;
+    }
 
-    sunObj.position.setX(-5000);
-    mercuryObj.position.setX(-500);
-    venusObj.position.setX(-300);
-    earthObj.position.setX(0);
+	requestAnimationFrame( animate );
+    
+    mercuryObj.rotateOnAxis(new THREE.Vector3(0,1,0),0.005);
+    
+    venusObj.rotateOnAxis(new THREE.Vector3(0,1,0),0.005);
+    
     earthObj.rotateOnAxis(new THREE.Vector3(0,1,0),0.005);
-    marsObj.position.setX(250);
+    
+    moonObj.lookAt(earthObj.position);
+    moonObj.rotateY(225);
+    moonObj.position.copy(new THREE.Vector3(moonOrbit[moonOrbitIndex].y,0,moonOrbit[moonOrbitIndex].x));
+    console.log(moonObj.position);
+    moonOrbitIndex += 1;
+    
+    marsObj.rotateOnAxis(new THREE.Vector3(0,1,0),0.005);
 
     interact.update();
     controls.update();
