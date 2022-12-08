@@ -9,9 +9,10 @@
     <script type="importmap">
         {
           "imports": {
-            "three": "https://unpkg.com/three/build/three.module.js",
-            "OrbitControls": "https://unpkg.com/three/examples/jsm/controls/OrbitControls.js",
-            "three.interactive": "https://cdn.jsdelivr.net/npm/three.interactive/build/three.interactive.js"
+            "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
+            "OrbitControls": "https://unpkg.com/three@0.147.0/examples/jsm/controls/OrbitControls.js",
+            "three.interactive": "https://cdn.jsdelivr.net/npm/three.interactive@1.5.0/build/three.interactive.js",
+            "dat.gui": "https://unpkg.com/three@0.147.0/examples/jsm/libs/lil-gui.module.min.js"
           }
         }
     </script>
@@ -20,7 +21,7 @@
 </head>
 
 <body>
-    <canvas id="graphics"></canvas>
+    <canvas id="graphics" style="margin: none; padding: none;"></canvas>
 
     <script src="script.js" type="module"></script>
 </body>
