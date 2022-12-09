@@ -5,9 +5,10 @@ import { GUI } from 'dat.gui';
 
 // MODIFYABLE VARIABLES
 
-const speedControl = {speedControl:1};
-const spinControl = {spinControl:0.00000083927};
-const showOrbits = {showOrbits:true};
+const speedControl = {"Orbit Speed":1};
+const spinControl = {"Spin Speed":0.00000083927};
+const showOrbits = {"Show Orbits":true};
+const hideMoons = {"Show Moons":true, "Show Moon Orbits": false};
 
 // ===================== PLANETARY DATA ==================
 
@@ -74,7 +75,7 @@ const mars = {
     satellites: [
         {
         name: "Phobos",
-        semi_major: 9376*8,
+        semi_major: 9376*6,
         eccentric: 0.0151,
         inclination: 1.093,
         radius: 11.2667*8,
@@ -82,7 +83,7 @@ const mars = {
         },
         {
         name: "Deimos",
-        semi_major: 23463.2*8,
+        semi_major: 23463.2*6,
         eccentric: 0.00033,
         inclination: 0.93,
         radius: 6.29*8,
@@ -106,6 +107,30 @@ const jupiter = {
         inclination: 2.213,
         radius: 1821.6*8,
         tilt: 0,
+        },
+        {
+        name: "Europa",
+        semi_major: 0.6711*13,
+        eccentric: 0.009,
+        inclination: 0.47,
+        radius: 1560.8*8,
+        tilt: 0.1,
+        },
+        {
+        name: "Ganymede",
+        semi_major: 1.0704*10,
+        eccentric: 0.001,
+        inclination: 0.18,
+        radius: 2631.2*8,
+        tilt: 0.33,
+        },
+        {
+        name: "Callisto",
+        semi_major: 1.8827*7,
+        eccentric: 0.007,
+        inclination: 0.19,
+        radius: 2410.3*8,
+        tilt: 0,
         }
     ]
 }
@@ -117,7 +142,60 @@ const saturn = {
     inclination: 2.486,
     radius: 57316*4,
     tilt: 26.73,
-    satellites: []
+    satellites: [
+        {
+            name: "Mimas",
+            semi_major: 0.18552*60,
+            eccentric: 0.0202,
+            inclination: 1.53,
+            radius: 198*8,
+            tilt: 0,
+        },
+        {
+            name: "Enceladus",
+            semi_major: 0.23802*52.5,
+            eccentric: 0.0045,
+            inclination: 0,
+            radius: 252*8,
+            tilt: 0,
+        },
+        {
+            name: "Tethys",
+            semi_major: 0.29466*45,
+            eccentric: 0,
+            inclination: 1.86,
+            radius: 531*8,
+            tilt: 0,
+        },
+        {
+            name: "Dione",
+            semi_major: 0.3774*37.5,
+            eccentric: 0.0022,
+            inclination: 0.02,
+            radius: 561.5*8,
+            tilt: 0,
+        },
+        {
+            name: "Rhea",
+            semi_major: 0.52704*30,
+            eccentric: 0.001,
+            inclination: 0.35,
+            radius: 763.5*8,
+            tilt: 0,
+        },
+        {
+            name: "Titan",
+            semi_major: 1.22183*15,
+            eccentric: 0.0292,
+            inclination: 0.33,
+            radius: 2574.5*8,
+            tilt: 0,
+        }
+    ]
+}
+
+for(let i = 0; i < saturn.satellites.length; i++){
+    console.log(saturn.satellites[i].semi_major);
 }
 
 const uranus = {
@@ -172,7 +250,7 @@ function generateOrbit(body, centerX, centerY, count) {
 
     const orbitMesh = new THREE.Line(new THREE.BufferGeometry().setFromPoints( pathArray ), new THREE.LineBasicMaterial({color:"#fff",linewidth:1}) );
 
-    if(showOrbits.showOrbits){
+    if(showOrbits["Show Orbits"]){
         scene.add(orbitMesh);
     }
 
@@ -190,7 +268,7 @@ function addBody(texture, body) {
 
     interact.add(obj);
     obj.addEventListener('click', function(){
-        controlTarget.target = obj.position;
+        controlTarget["Camera Target"] = obj.position;
     });
 
     return obj;
@@ -215,7 +293,7 @@ window.addEventListener('resize', function(){
 
 const interact = new InteractionManager(renderer, cam, renderer.domElement);
 
-let controlTarget = {target: new THREE.Vector3()};
+let controlTarget = {"Camera Target": new THREE.Vector3()};
 const controls = new OrbitControls(cam, renderer.domElement);
 
 cam.position.setZ(900);
@@ -251,7 +329,7 @@ sunObj.material = new THREE.MeshBasicMaterial({map: sunTextureMap});
 const sunLight = new THREE.PointLight("#ffd782",1.5, 35000, 0.75);
 sunLight.position.copy(sunObj.position);
 scene.add(sunLight);
-controlTarget.target = sunObj.position;
+controlTarget["Camera Target"] = sunObj.position;
 
 let orbitSpeed = 134.766507574;
 
@@ -293,6 +371,24 @@ let ioOrbit = generateOrbit(jupiter.satellites[0],jupiterObj.position.x,jupiterO
 ioObj.position.copy(ioOrbit[0][0]);
 let ioOrbitIndex = 0;
 
+let europaOrbitSpeed = 500;
+const europaObj = addBody("textures/europa.jpg", jupiter.satellites[1]);
+let europaOrbit = generateOrbit(jupiter.satellites[1],jupiterObj.position.x,jupiterObj.position.z,europaOrbitSpeed);
+europaObj.position.copy(europaOrbit[0][0]);
+let europaOrbitIndex = 0;
+
+let ganymedeOrbitSpeed = 550;
+const ganymedeObj = addBody("textures/ganymede.jpg", jupiter.satellites[2]);
+let ganymedeOrbit = generateOrbit(jupiter.satellites[2],jupiterObj.position.x,jupiterObj.position.z,ganymedeOrbitSpeed);
+ganymedeObj.position.copy(ganymedeOrbit[0][0]);
+let ganymedeOrbitIndex = 0;
+
+let callistoOrbitSpeed = 600;
+const callistoObj = addBody("textures/callisto.jpg", jupiter.satellites[3]);
+let callistoOrbit = generateOrbit(jupiter.satellites[3],jupiterObj.position.x,jupiterObj.position.z,callistoOrbitSpeed);
+callistoObj.position.copy(callistoOrbit[0][0]);
+let callistoOrbitIndex = 0;
+
 const saturnObj = addBody("textures/saturn.jpg", saturn);
 const saturnRings = new THREE.Mesh( new THREE.RingGeometry((66900*4)/500,(139826*4)/500,100,1,0,degrees_to_radians(360)), new THREE.MeshStandardMaterial({ color:"#fff", side: THREE.DoubleSide, map: new THREE.TextureLoader().load("textures/saturn ring.png"), transparent: true }) );
 saturnRings.setRotationFromAxisAngle(new THREE.Vector3(1,0,0),degrees_to_radians(90));
@@ -301,6 +397,42 @@ saturnObj.attach(saturnRings);
 const saturnOrbit = generateOrbit(saturn,sunObj.position.x,sunObj.position.z,orbitSpeed*saturn.semi_major);
 saturnObj.position.copy(saturnOrbit[0][0]);
 let saturnOrbitIndex = 0;
+
+let mimasOrbitSpeed = 300;
+const mimasObj = addBody("textures/mimas.jpg", saturn.satellites[0]);
+let mimasOrbit = generateOrbit(saturn.satellites[0],saturnObj.position.x,saturnObj.position.z,mimasOrbitSpeed);
+mimasObj.position.copy(mimasOrbit[0][0]);
+let mimasOrbitIndex = 0;
+
+let enceladusOrbitSpeed = 350;
+const enceladusObj = addBody("textures/enceladus.jpg", saturn.satellites[1]);
+let enceladusOrbit = generateOrbit(saturn.satellites[1],saturnObj.position.x,saturnObj.position.z,enceladusOrbitSpeed);
+enceladusObj.position.copy(enceladusOrbit[0][0]);
+let enceladusOrbitIndex = 0;
+
+let tethysOrbitSpeed = 400;
+const tethysObj = addBody("textures/tethys.jpg", saturn.satellites[2]);
+let tethysOrbit = generateOrbit(saturn.satellites[2],saturnObj.position.x,saturnObj.position.z,tethysOrbitSpeed);
+tethysObj.position.copy(tethysOrbit[0][0]);
+let tethysOrbitIndex = 0;
+
+let dioneOrbitSpeed = 450;
+const dioneObj = addBody("textures/dione.jpg", saturn.satellites[3]);
+let dioneOrbit = generateOrbit(saturn.satellites[3],saturnObj.position.x,saturnObj.position.z,dioneOrbitSpeed);
+dioneObj.position.copy(dioneOrbit[0][0]);
+let dioneOrbitIndex = 0;
+
+let rheaOrbitSpeed = 500;
+const rheaObj = addBody("textures/rhea.jpg", saturn.satellites[4]);
+let rheaOrbit = generateOrbit(saturn.satellites[4],saturnObj.position.x,saturnObj.position.z,rheaOrbitSpeed);
+rheaObj.position.copy(rheaOrbit[0][0]);
+let rheaOrbitIndex = 0;
+
+let titanOrbitSpeed = 550;
+const titanObj = addBody("textures/titan.jpg", saturn.satellites[5]);
+let titanOrbit = generateOrbit(saturn.satellites[5],saturnObj.position.x,saturnObj.position.z,titanOrbitSpeed);
+titanObj.position.copy(titanOrbit[0][0]);
+let titanOrbitIndex = 0;
 
 const uranusObj = addBody("textures/uranus.jpg", uranus);
 const uranusRings = new THREE.Mesh( new THREE.RingGeometry((26840*4)/500,(51149*4)/500,100,1,0,degrees_to_radians(360)), new THREE.MeshStandardMaterial({ color:"#fff", side: THREE.DoubleSide, map: new THREE.TextureLoader().load("textures/uranus ring.png"), transparent: true }) );
@@ -320,7 +452,7 @@ const light = new THREE.AmbientLight("#fff",0.2);
 scene.add(light);
 
 function animate() {
-    if(showOrbits.showOrbits === false) {
+    if(showOrbits["Show Orbits"] === false) {
         mercuryOrbit[1].visible = false;
         venusOrbit[1].visible = false;
         earthOrbit[1].visible = false;
@@ -358,11 +490,38 @@ function animate() {
     if(jupiterOrbitIndex >= orbitSpeed*jupiter.semi_major){
         jupiterOrbitIndex = 0;
     }
+    if(ioOrbitIndex >= ioOrbitSpeed){
+        ioOrbitIndex = 0;
+    }
+    if(europaOrbitIndex >= europaOrbitSpeed){
+        europaOrbitIndex = 0;
+    }
+    if(ganymedeOrbitIndex >= ganymedeOrbitSpeed){
+        ganymedeOrbitIndex = 0;
+    }
+    if(callistoOrbitIndex >= callistoOrbitSpeed){
+        callistoOrbitIndex = 0;
+    }
     if(saturnOrbitIndex >= orbitSpeed*saturn.semi_major){
         saturnOrbitIndex = 0;
     }
-    if(ioOrbitIndex >= ioOrbitSpeed){
-        ioOrbitIndex = 0;
+    if(mimasOrbitIndex >= mimasOrbitSpeed){
+        mimasOrbitIndex = 0;
+    }
+    if(enceladusOrbitIndex >= enceladusOrbitSpeed){
+        enceladusOrbitIndex = 0;
+    }
+    if(tethysOrbitIndex >= tethysOrbitSpeed){
+        tethysOrbitIndex = 0;
+    }
+    if(dioneOrbitIndex >= dioneOrbitSpeed){
+        dioneOrbitIndex = 0;
+    }
+    if(rheaOrbitIndex >= rheaOrbitSpeed){
+        rheaOrbitIndex = 0;
+    }
+    if(titanOrbitIndex >= titanOrbitSpeed){
+        titanOrbitIndex = 0;
     }
     if(uranusOrbitIndex >= orbitSpeed*uranus.semi_major){
         uranusOrbitIndex = 0;
@@ -373,13 +532,13 @@ function animate() {
 
 	requestAnimationFrame( animate );
     
-    mercuryObj.rotateOnAxis(new THREE.Vector3(0,1,0),(mercury.radius/8)*spinControl.spinControl);
+    mercuryObj.rotateOnAxis(new THREE.Vector3(0,1,0),(mercury.radius/8)*spinControl["Spin Speed"]);
     mercuryObj.position.copy(mercuryOrbit[0][mercuryOrbitIndex]);
     
-    venusObj.rotateOnAxis(new THREE.Vector3(0,1,0),(venus.radius/8)*spinControl.spinControl);
+    venusObj.rotateOnAxis(new THREE.Vector3(0,1,0),(venus.radius/8)*spinControl["Spin Speed"]);
     venusObj.position.copy(venusOrbit[0][venusOrbitIndex]);
     
-    earthObj.rotateOnAxis(new THREE.Vector3(0,1,0),(earth.radius/8)*spinControl.spinControl);
+    earthObj.rotateOnAxis(new THREE.Vector3(0,1,0),(earth.radius/8)*spinControl["Spin Speed"]);
     earthObj.position.copy(earthOrbit[0][earthOrbitIndex]);
     
     scene.remove(moonOrbit[1]);
@@ -388,10 +547,10 @@ function animate() {
     moonObj.rotateY(225);
     moonObj.position.copy(moonOrbit[0][moonOrbitIndex]);
     
-    marsObj.rotateOnAxis(new THREE.Vector3(0,1,0),(mars.radius/8)*spinControl.spinControl);
+    marsObj.rotateOnAxis(new THREE.Vector3(0,1,0),(mars.radius/8)*spinControl["Spin Speed"]);
     marsObj.position.copy(marsOrbit[0][marsOrbitIndex]);
 
-    jupiterObj.rotateOnAxis(new THREE.Vector3(0,1,0),(jupiter.radius/12)*spinControl.spinControl);
+    jupiterObj.rotateOnAxis(new THREE.Vector3(0,1,0),(jupiter.radius/12)*spinControl["Spin Speed"]);
     jupiterObj.position.copy(jupiterOrbit[0][jupiterOrbitIndex]);
 
     scene.remove(ioOrbit[1]);
@@ -399,46 +558,152 @@ function animate() {
     ioObj.lookAt(jupiterObj.position);
     ioObj.position.copy(ioOrbit[0][ioOrbitIndex]);
 
-    saturnObj.rotateOnAxis(new THREE.Vector3(0,1,0),(saturn.radius/12)*spinControl.spinControl);
+    scene.remove(europaOrbit[1]);
+    europaOrbit = generateOrbit(jupiter.satellites[1],jupiterObj.position.x,jupiterObj.position.z,europaOrbitSpeed);
+    europaObj.lookAt(jupiterObj.position);
+    europaObj.position.copy(europaOrbit[0][europaOrbitIndex]);
+
+    scene.remove(ganymedeOrbit[1]);
+    ganymedeOrbit = generateOrbit(jupiter.satellites[2],jupiterObj.position.x,jupiterObj.position.z,ganymedeOrbitSpeed);
+    ganymedeObj.lookAt(jupiterObj.position);
+    ganymedeObj.position.copy(ganymedeOrbit[0][ganymedeOrbitIndex]);
+
+    scene.remove(callistoOrbit[1]);
+    callistoOrbit = generateOrbit(jupiter.satellites[3],jupiterObj.position.x,jupiterObj.position.z,callistoOrbitSpeed);
+    callistoObj.lookAt(jupiterObj.position);
+    callistoObj.position.copy(callistoOrbit[0][callistoOrbitIndex]);
+
+    saturnObj.rotateOnAxis(new THREE.Vector3(0,1,0),(saturn.radius/12)*spinControl["Spin Speed"]);
     saturnObj.position.copy(saturnOrbit[0][saturnOrbitIndex]);
 
-    uranusObj.rotateOnAxis(new THREE.Vector3(0,1,0),(uranus.radius/12)*spinControl.spinControl);
+    scene.remove(mimasOrbit[1]);
+    mimasOrbit = generateOrbit(saturn.satellites[0],saturnObj.position.x,saturnObj.position.z,mimasOrbitSpeed);
+    mimasObj.lookAt(saturnObj.position);
+    mimasObj.position.copy(mimasOrbit[0][mimasOrbitIndex]);
+
+    scene.remove(enceladusOrbit[1]);
+    enceladusOrbit = generateOrbit(saturn.satellites[1],saturnObj.position.x,saturnObj.position.z,enceladusOrbitSpeed);
+    enceladusObj.lookAt(saturnObj.position);
+    enceladusObj.position.copy(enceladusOrbit[0][enceladusOrbitIndex]);
+
+    scene.remove(tethysOrbit[1]);
+    tethysOrbit = generateOrbit(saturn.satellites[2],saturnObj.position.x,saturnObj.position.z,tethysOrbitSpeed);
+    tethysObj.lookAt(saturnObj.position);
+    tethysObj.position.copy(tethysOrbit[0][tethysOrbitIndex]);
+
+    scene.remove(dioneOrbit[1]);
+    dioneOrbit = generateOrbit(saturn.satellites[3],saturnObj.position.x,saturnObj.position.z,dioneOrbitSpeed);
+    dioneObj.lookAt(saturnObj.position);
+    dioneObj.position.copy(dioneOrbit[0][dioneOrbitIndex]);
+
+    scene.remove(rheaOrbit[1]);
+    rheaOrbit = generateOrbit(saturn.satellites[4],saturnObj.position.x,saturnObj.position.z,rheaOrbitSpeed);
+    rheaObj.lookAt(saturnObj.position);
+    rheaObj.position.copy(rheaOrbit[0][rheaOrbitIndex]);
+
+    scene.remove(titanOrbit[1]);
+    titanOrbit = generateOrbit(saturn.satellites[5],saturnObj.position.x,saturnObj.position.z,titanOrbitSpeed);
+    titanObj.lookAt(saturnObj.position);
+    titanObj.position.copy(titanOrbit[0][titanOrbitIndex]);
+
+    uranusObj.rotateOnAxis(new THREE.Vector3(0,1,0),(uranus.radius/12)*spinControl["Spin Speed"]);
     uranusObj.position.copy(uranusOrbit[0][uranusOrbitIndex]);
 
-    neptuneObj.rotateOnAxis(new THREE.Vector3(0,1,0),(neptune.radius/12)*spinControl.spinControl);
+    neptuneObj.rotateOnAxis(new THREE.Vector3(0,1,0),(neptune.radius/12)*spinControl["Spin Speed"]);
     neptuneObj.position.copy(neptuneOrbit[0][neptuneOrbitIndex]);
 
-    mercuryOrbitIndex += speedControl.speedControl;
-    venusOrbitIndex += speedControl.speedControl;
-    moonOrbitIndex += speedControl.speedControl;
-    earthOrbitIndex += speedControl.speedControl;
-    marsOrbitIndex += speedControl.speedControl;
-    jupiterOrbitIndex += speedControl.speedControl;
-    ioOrbitIndex += speedControl.speedControl;
-    saturnOrbitIndex += speedControl.speedControl;
-    uranusOrbitIndex += speedControl.speedControl;
-    neptuneOrbitIndex += speedControl.speedControl;
+    if(!hideMoons['Show Moons']) {
+        moonObj.visible = false;
+        ioObj.visible = false;
+        europaObj.visible = false;
+        ganymedeObj.visible = false;
+        callistoObj.visible = false;
+        mimasObj.visible = false;
+        enceladusObj.visible = false;
+        tethysObj.visible = false;
+        dioneObj.visible = false;
+        rheaObj.visible = false;
+        titanObj.visible = false;
+    } else {
+        moonObj.visible = true;
+        ioObj.visible = true;
+        europaObj.visible = true;
+        ganymedeObj.visible = true;
+        callistoObj.visible = true;
+        mimasObj.visible = true;
+        enceladusObj.visible = true;
+        tethysObj.visible = true;
+        dioneObj.visible = true;
+        rheaObj.visible = true;
+        titanObj.visible = true;
+    }
+    if(!hideMoons['Show Moon Orbits']) {
+        moonOrbit[1].visible = false;
+        ioOrbit[1].visible = false;
+        europaOrbit[1].visible = false;
+        ganymedeOrbit[1].visible = false;
+        callistoOrbit[1].visible = false;
+        mimasOrbit[1].visible = false;
+        enceladusOrbit[1].visible = false;
+        tethysOrbit[1].visible = false;
+        dioneOrbit[1].visible = false;
+        rheaOrbit[1].visible = false;
+        titanOrbit[1].visible = false;
+    } else {
+        moonOrbit[1].visible = true;
+        ioOrbit[1].visible = true;
+        europaOrbit[1].visible = true;
+        ganymedeOrbit[1].visible = true;
+        callistoOrbit[1].visible = true;
+        mimasOrbit[1].visible = true;
+        enceladusOrbit[1].visible = true;
+        tethysOrbit[1].visible = true;
+        dioneOrbit[1].visible = true;
+        rheaOrbit[1].visible = true;
+        titanOrbit[1].visible = true;
+    }
+
+    mercuryOrbitIndex += speedControl["Orbit Speed"];
+    venusOrbitIndex += speedControl["Orbit Speed"];
+    moonOrbitIndex += speedControl["Orbit Speed"];
+    earthOrbitIndex += speedControl["Orbit Speed"];
+    marsOrbitIndex += speedControl["Orbit Speed"];
+    jupiterOrbitIndex += speedControl["Orbit Speed"];
+    ioOrbitIndex += speedControl["Orbit Speed"];
+    europaOrbitIndex += speedControl["Orbit Speed"];
+    ganymedeOrbitIndex += speedControl["Orbit Speed"];
+    callistoOrbitIndex += speedControl["Orbit Speed"];
+    saturnOrbitIndex += speedControl["Orbit Speed"];
+    mimasOrbitIndex += speedControl["Orbit Speed"];
+    enceladusOrbitIndex += speedControl["Orbit Speed"];
+    tethysOrbitIndex += speedControl["Orbit Speed"];
+    dioneOrbitIndex += speedControl["Orbit Speed"];
+    rheaOrbitIndex += speedControl["Orbit Speed"];
+    titanOrbitIndex += speedControl["Orbit Speed"];
+    uranusOrbitIndex += speedControl["Orbit Speed"];
+    neptuneOrbitIndex += speedControl["Orbit Speed"];
 
     interact.update();
     controls.update();
-    controls.target.lerp(controlTarget.target, 0.1);
+    controls.target.lerp(controlTarget["Camera Target"], 0.1);
 	renderer.render( scene, cam );
 }
 animate();
 
 // GUI
 const gui = new GUI();
-gui.add(speedControl, 'speedControl', 0, 50, 1);
-gui.add(spinControl, 'spinControl', 0, 0.00003, 0.00000000001);
-gui.add(showOrbits, 'showOrbits');
-gui.add(controlTarget, 'target', {
+gui.add(speedControl, 'Orbit Speed', 0, 50, 1);
+gui.add(spinControl, 'Spin Speed', 0, 0.00003, 0.00000000001);
+gui.add(showOrbits, 'Show Orbits');
+gui.add(hideMoons, 'Show Moons');
+gui.add(hideMoons, 'Show Moon Orbits');
+gui.add(controlTarget, 'Camera Target', {
     "The Sun": sunObj.position,
     "Mercury": mercuryObj.position,
     "Venus": venusObj.position,
     "Earth": earthObj.position,
-    "The Moon": moonObj.position,
+    "Mars": marsObj.position,
     "Jupiter": jupiterObj.position,
-    "Io": ioObj.position,
     "Saturn": saturnObj.position,
     "Uranus": uranusObj.position,
     "Neptune": neptuneObj.position
