@@ -194,10 +194,6 @@ const saturn = {
     ]
 }
 
-for(let i = 0; i < saturn.satellites.length; i++){
-    console.log(saturn.satellites[i].semi_major);
-}
-
 const uranus = {
     name: "Uranus",
     semi_major: 2867.043/16,
@@ -691,7 +687,8 @@ function animate() {
 animate();
 
 // GUI
-const gui = new GUI();
+const gui = new GUI( {autoPlace: false} );
+document.getElementById("dat.gui").append(gui.domElement);
 gui.add(speedControl, 'Orbit Speed', 0, 50, 1);
 gui.add(spinControl, 'Spin Speed', 0, 0.00003, 0.00000000001);
 gui.add(showOrbits, 'Show Orbits');

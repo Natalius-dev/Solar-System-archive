@@ -1,29 +1,839 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-US">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <script type="importmap">
-        {
-          "imports": {
-            "three": "https://unpkg.com/three@0.147.0/build/three.module.js",
-            "OrbitControls": "https://unpkg.com/three@0.147.0/examples/jsm/controls/OrbitControls.js",
-            "three.interactive": "https://cdn.jsdelivr.net/npm/three.interactive@1.5.0/build/three.interactive.js",
-            "dat.gui": "https://unpkg.com/three@0.147.0/examples/jsm/libs/lil-gui.module.min.js"
-          }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base target="_parent">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&amp;display=swap">
+    <link rel="stylesheet" href="https://mdbootstrap.com/api/snippets/static/download/MDB5-Free_6.0.1/css/mdb.min.css">
+    <link href="https://fonts.cdnfonts.com/css/nasa" rel="stylesheet">
+    <!-- polish -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        INPUT:-webkit-autofill,
+        SELECT:-webkit-autofill,
+        TEXTAREA:-webkit-autofill {
+            animation-name: onautofillstart
         }
-    </script>
 
-    <title>Solar System</title>
+        INPUT:not(:-webkit-autofill),
+        SELECT:not(:-webkit-autofill),
+        TEXTAREA:not(:-webkit-autofill) {
+            animation-name: onautofillcancel
+        }
+
+        @keyframes onautofillstart {}
+
+        @keyframes onautofillcancel {}
+
+
+        /* Carousel styling */
+        #introCarousel,
+        .carousel-inner,
+        .carousel-item,
+        .carousel-item.active {
+            height: 100vh;
+        }
+
+        .carousel-item:nth-child(1) {
+            background-image: url('https://cdn.discordapp.com/attachments/881506146706395167/1049355392318177310/earth-min.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+        }
+
+        .carousel-item:nth-child(2) {
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+        }
+
+
+        /* Height for devices larger than 576px */
+        @media (min-width: 992px) {
+            #introCarousel {
+                margin-top: -58.59px;
+            }
+
+            #introCarousel,
+            .carousel-inner,
+            .carousel-item,
+            .carousel-item.active {
+                height: 100vh;
+            }
+        }
+
+        .navbar .nav-link {
+            color: #fff !important;
+        }
+
+        /*Hide scroll bar*/
+        /*Chrome, Safari, Opera*/
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /*Edge, IE, Opera*/
+        body {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+            overflow-x: hidden;
+        }
+
+
+        /*timeline implementation*/
+        /* The actual timeline (the vertical ruler) */
+        .main-timeline-2 {
+            position: relative;
+        }
+
+        /* The actual timeline (the vertical ruler) */
+        .main-timeline-2::after {
+            content: "";
+            position: absolute;
+            width: 3px;
+            background-color: #251749;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+
+        /* Container around content */
+        .timeline-2 {
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+        }
+
+        /* The circles on the timeline */
+        .timeline-2::after {
+            content: "";
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            right: -11px;
+            background-color: #495579;
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        /* Place the container to the left */
+        .left-2 {
+            padding: 0px 40px 20px 0px;
+            left: 0;
+        }
+
+        /* Place the container to the right */
+        .right-2 {
+            padding: 0px 0px 20px 40px;
+            left: 50%;
+        }
+
+        /* Add arrows to the left container (pointing right) */
+        .left-2::before {
+            content: " ";
+            position: absolute;
+            top: 18px;
+            z-index: 1;
+            right: 30px;
+            border: medium solid white;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent #263159;
+        }
+
+        /* Add arrows to the right container (pointing left) */
+        .right-2::before {
+            content: " ";
+            position: absolute;
+            top: 18px;
+            z-index: 1;
+            left: 30px;
+            border: medium solid white;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent #263159 transparent transparent;
+        }
+
+        /* Fix the circle for containers on the right side */
+        .right-2::after {
+            left: -14px;
+        }
+
+        /* Media queries - Responsive timeline on screens less than 600px wide */
+        @media screen and (max-width: 600px) {
+
+            /* Place the timelime to the left */
+            .main-timeline-2::after {
+                left: 31px;
+            }
+
+            /* Full-width containers */
+            .timeline-2 {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+
+            /* Make sure that all arrows are pointing leftwards */
+            .timeline-2::before {
+                left: 60px;
+                border: medium solid white;
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+
+            /* Make sure all circles are at the same spot */
+            .left-2::after,
+            .right-2::after {
+                left: 18px;
+            }
+
+            .left-2::before {
+                right: auto;
+            }
+
+            /* Make all right containers behave like the left ones */
+            .right-2 {
+                left: 0%;
+            }
+        }
+
+        /*Scroll up button implementation*/
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            z-index: 2;
+        }
+    </style>
+    <title>[ Space ]</title>
 </head>
 
 <body>
-    <div style="height: 100vh; width: 100vw;"><canvas id="graphics" style="margin: none; padding: none; height: 100%; width: 100%; display: block;"></canvas></div>
+    <!--Main Navigation-->
+    <button type="button" class="btn btn-dark btn-floating btn-lg" id="btn-back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    <header>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark d-none d-lg-block" style="z-index: 2000;">
+            <div class="container-fluid">
+                <!-- Navbar brand -->
+                <a class="navbar-brand nav-link" target="_blank" href="...">
+                    <strong>CC</strong>
+                </a>
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse"
+                    data-mdb-target="#navbarExample01" aria-controls="navbarExample01" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarExample01">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" aria-current="page" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="..." rel="nofollow" target="_blank">About</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Projects
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="#">3D Model</a></li>
+                                <li><a class="dropdown-item" href="#">Documentation</a></li>
+                            </ul>
+                        </li>
+                    </ul>
 
-    <script src="script.js" type="module"></script>
+                    <ul class="navbar-nav d-flex flex-row">
+                        <!-- Icons -->
+                        <li class="nav-item me-3 me-lg-0">
+                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item me-3 me-lg-0">
+                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item me-3 me-lg-0">
+                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item me-3 me-lg-0">
+                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar -->
+
+        <div class="scroll-container">
+            <!-- Carousel wrapper -->
+            <div id="introCarousel" class="carousel slide carousel-fade" data-interval="false">
+                <!-- Indicators -->
+                <ol class="carousel-indicators">
+                    <li data-mdb-target="#introCarousel" data-mdb-slide-to="0" class="active" aria-current="true"></li>
+                    <li data-mdb-target="#introCarousel" data-mdb-slide-to="1" class=""></li>
+                </ol>
+
+                <!-- Inner -->
+                <div class="carousel-inner rounded-5 shadow-4-strong">
+                    <!-- Single item -->
+                    <div class="carousel-item carousel-item-next carousel-item-start">
+                        <div class="mask" style="background-color: rgba(0, 0, 0, 0.4);">
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                <div class="text-white text-center">
+                                    <h1 class="display-1">[ Space ]</h1>
+                                    <h5 class="mb-4 lead">by Group 5</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Single item -->
+                    <div class="carousel-item active carousel-item-start">
+                        <video class="img-fluid" autoplay loop muted>
+                            <source
+                                src="https://cdn.discordapp.com/attachments/881506146706395167/1049536356034039879/earth.mp4"
+                                type="video/mp4">
+                        </video>
+                        <div class="carousel-caption d-none d-md-block">
+                            <div class="text-white text-center">
+                                <h1>[ Space ]</h1>
+                                <p class="lead">Solar System</p>
+                                <a class="btn btn-outline-light" href="3D.html">Open model</a>
+                                <a class="btn btn-outline-light" href="#docs">Open docs</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Inner -->
+
+            <!-- Controls -->
+            <a class="carousel-control-prev" href="#introCarousel" role="button" data-mdb-slide="prev">
+                <!-- <span class="carousel-control-prev-icon" aria-hidden="true"></span> -->
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#introCarousel" role="button" data-mdb-slide="next">
+                <!-- <span class="carousel-control-next-icon" aria-hidden="true"></span> -->
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <!-- Carousel wrapper -->
+    </header>
+    <!--Main Navigation-->
+
+    <!--Main layout-->
+    <main class="mt-5">
+        <div class="container">
+
+            <!--Section: Content-->
+            <section id="docs">
+                <div class="container py-5">
+                    <div class="main-timeline-2">
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050401825972555846/delete.jpg"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Solar_System" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Solar System</h1>
+                                    <p class="lead">Diametre: 287.46 billion Km <br>
+                                        Composition and Structure: Sun, <br>
+                                        the planets: Mercury - Venus - Earth - Mars -
+                                        Jupiter - Saturn - Uranus - Neptune; dwarf planets such as Pluto; dozens of
+                                        moons; and millions of asteroids, comets, and meteoroids.</p>
+
+                                    <p class="mb-0 text-muted">The Solar System is the Sun and all the objects that
+                                        orbit around
+                                        it. The Sun is orbited by planets, asteroids, comets and other things. <br><br>
+                                        The Solar System is about 4.6 billion years old. It formed by gravity in a large
+                                        molecular cloud. Most of this matter came together in the center, and the rest
+                                        flattened into an orbiting disk that became the Solar System. It is thought that
+                                        almost all stars form by this process. <br> <br>
+                                        The Sun is a star. It makes up 99.9% of the Solar System's mass. This means that
+                                        it has strong gravity. The other objects are pulled into orbit around the Sun.
+                                        The Sun is mostly made out of hydrogen, and some helium and higher elements.
+                                        <br><br>
+                                        There are eight planets in the Solar System. From closest to farthest from the
+                                        Sun, they are: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.
+                                        The first four planets are called terrestrial planets. They are mostly made of
+                                        rock and metal, and they are mostly solid. The last four planets are called gas
+                                        giants. This is because they are much larger than other planets and are mostly
+                                        made of gas.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 right-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://engineering.nd.edu/wp-content/uploads/2020/09/sun-flares-wide-cc-800x800.jpg"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Sun" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Sun</h1>
+                                    <p class="lead">
+                                        Mass: 1.98 x 10<sup>30</sup> Kg <br>
+                                        Diameter: 1392684 Km <br>
+                                        Composition: 92.1% Hydrogen - 7.9% Helium
+
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        The Sun is a star which is located at the center of our solar system. It is a
+                                        yellow dwarf star that gives off different types of energy such as infra-red
+                                        energy (heat), ultraviolet light, radio waves and light. It also gives off a
+                                        stream of particles, which reaches Earth as "solar wind". The source of all this
+                                        energy is nuclear fusion. Nuclear fusion is the reaction in the star which turns
+                                        hydrogen into helium and makes huge amounts of energy. <br><br>
+
+                                        The Sun is a star like many others in our Milky Way galaxy. The Sun is a type of
+                                        star called a G-type main-sequence star based on its spectral class. It has
+                                        existed for a little over 4.5 billion years. It is going to continue for at
+                                        least as long. The Sun is about a hundred times as wide as the Earth. The Sun
+                                        fuses about 600 million tons of hydrogen into helium every second. It can take
+                                        between 10,000 and 170,000 years for the energy in the core of the Sun to
+                                        escape.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050427912744095924/800px-Mercury_in_true_color.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Mercury_(planet)" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Mercury</h1>
+                                    <p class="lead">Mass: 3.3 x 10<sup>23</sup> Kg. <br>
+                                        Diameter: 4879 Km. <br>
+                                        Composition: 70% Metals - 30% Silicates (density 5.43 g/cm3)
+
+                                    </p>
+                                    <p class="mb-0 text-muted">Mercury is the smallest planet in the Solar System. It is
+                                        the
+                                        closest planet to the sun. Mercury is bright when we can see it from Earth. It
+                                        cannot be seen easily because it is usually too close to the Sun. Because of
+                                        this, Mercury can only be seen in the morning or evening twilight or when there
+                                        is a solar eclipse. <br><br>
+                                        Less is known about Mercury than about other planets of our Solar System. Even
+                                        with telescopes only a small, bright crescent can be seen. It is also hard to
+                                        put a satellite in orbit around it. Two spacecraft have visited Mercury. The
+                                        first one was Mariner 10. It only made a map of about 45% of Mercury's surface
+                                        from 1974 to 1975. The second is the MESSENGER spacecraft, which finished
+                                        mapping Mercury in March 2013. <br><br>
+
+                                        Mercury looks like Earth's Moon. It has many craters and smooth plains. It has
+                                        no moons and little atmosphere as we know it. However, Mercury does have an
+                                        extremely thin atmosphere, known as an exosphere. Mercury has a large iron core.
+                                        Because of this Mercury has a magnetic field about 1% as strong as that of the
+                                        Earth. It is a very dense planet because its core is large.
+                                        Temperature at the surface can be anywhere from about 90 to 700 K (-183 °C to
+                                        427 °C, -297 °F to 801 °F), with the subsolar point being the hottest and the
+                                        bottoms of craters near the poles being the coldest. Even though Mercury is the
+                                        closest planet to the Sun, it is not the hottest. This is because it has no
+                                        greenhouse effect. The heat that the Sun gives it, quickly escapes into space.
+                                        The hottest planet is Venus.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-2 right-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050433742763720754/800px-PIA23791-Venus-NewlyProcessedView-20200608.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Venus" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Venus</h1>
+                                    <p class="lead">Mass: 4.9 x 10<sup>24</sup> Kg <br>
+                                        Diameter: 12104 Km <br>
+                                        Composition:
+                                        96.5% Carbon dioxide - 3.5% Nitrogen - 0.015% Sulfur dioxide - 0.0070% Argon -
+                                        0.0020% Water vapor - 0.0017% Carbon monoxide - 0.0012% Helium - 0.0007% Neon
+                                    </p>
+                                    <p class="text-muted">
+                                        Venus is the second planet from the Sun. Venus is the only
+                                        planet in the Solar System that has a day longer than a year. The year length of
+                                        Venus is 225 Earth days.<br>
+                                        The day length of Venus is 243 Earth days. <br>
+                                        Venus is a terrestrial planet because it has a solid, rocky surface like other
+                                        planets in the inner Solar System. The ancient Romans named it after their
+                                        goddess Venus, goddess of love and beauty <br>
+                                        Venus is the brightest thing in the night sky except for the Moon. It is
+                                        sometimes called the morning star or the evening star as at some elongations it
+                                        is easily seen just before the sun comes up in the morning. At other times, it
+                                        can be seen just after the sun goes down in the evening. <br>
+                                        Venus is sometimes called the sister planet of Earth as they are quite similar
+                                        in size and gravity. In other ways the planets are very different. Venus'
+                                        atmosphere (air) is mostly carbon dioxide with clouds of sulphuric acid.
+                                        Sulphuric acid is a chemical that is poisonous to life. <br>
+                                        The thick atmosphere makes it hard to see the surface. Until the late twentieth
+                                        century many thought there might be life there. The pressure on Venus' surface
+                                        is 92 times that of Earth. Venus is one of only 2 planets in the Solar System
+                                        (the other being Mercury) that has no moons. Venus spins very slowly on its axis
+                                        and it spins in the opposite direction to the other planets. <br><br>
+
+                                        Venus is the second planet from the Sun. Venus is the only planet in the Solar
+                                        System that has a day longer than a year. The year length of Venus is 225 Earth
+                                        days. The day length of Venus is 243 Earth days.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050433952067887194/1-bluemarble_west.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Earth" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Earth</h1>
+                                    <p class="lead">
+                                        Mass: 6 x 10<sup>24</sup> Kg <br>
+                                        Diameter: 12756 Km <br>
+                                        Composition: Crust - Upper Mantle - Mantle - Outer Core - Inner Core
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Earth is the third planet from the Sun in the Solar System. It is the only
+                                        planet known to have life on it. The Earth formed about 4.5 billion years ago.
+                                        It is one of four rocky planets on the inner side of the Solar System. <br><br>
+
+                                        The large mass of the Sun keeps the Earth in orbit through the force of gravity.
+                                        Earth also turns around in space, so that different parts face the Sun at
+                                        different times. Earth goes around the Sun once (one year) for every 365.4
+                                        times it turns around (one day). <br><br>
+
+                                        Earth is the only planet in the Solar System that has a large amount of liquid
+                                        water on its surface. About 74% of the surface of Earth is covered by liquid or
+                                        frozen water.Because of this, people sometimes call it the blue planet.
+                                        Because of its water, Earth is home to millions of species of plants and animals
+                                        which need water to survive. The things that live on Earth have changed its
+                                        surface greatly.
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-2 right-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050434419053301800/800px-OSIRIS_Mars_true_color.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Mars" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Mars</h1>
+                                    <p class="lead">
+                                        Mass: 6.4 x 10<sup>23</sup> Kg <br>
+                                        Diameter: 6792 Km <br>
+                                        Composition: Iron - Nickel - Sulfur.
+
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Mars is the fourth planet from the Sun in the Solar System and the
+                                        second-smallest planet. Mars is a terrestrial planet with polar ice caps of
+                                        frozen water and carbon dioxide. It has the largest volcano in the Solar System,
+                                        and some very large impact craters. <br><br>
+                                        Mars is named after the mythological Roman
+                                        god of war because it appears red. Space probes such as the Viking program
+                                        landers are the main tools for the exploration of Mars.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050436227272286278/InnerSolarSystem-en.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Asteroid_belt" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Asteroid Belt</h1>
+                                    <p class="lead">
+                                        Diameter: 225308160 Km <br>
+                                        Composition: Rock and Stone, Iron and Nickel Metals.
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        The asteroid belt or main belt is a ring of small and large rocks and dust
+                                        between the orbits of Mars and Jupiter. The biggest object in the asteroid belt
+                                        is Ceres, a dwarf planet. The Kirkwood gaps separate the asteroid belt into
+                                        several groups. <br><br>
+
+                                        Most asteroids orbit at 2 to 3 times the distance between Earth and the Sun.
+                                        Planets that are "inside" - or before - the asteroid belt (which means they are
+                                        closer to the sun) are called inner planets. Planets that are "outside" - that
+                                        is, after - the asteroid belt are called outer planets.
+
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 right-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050439146046504980/800px-Jupiter_and_its_shrunken_Great_Red_Spot.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Jupiter" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Jupiter</h1>
+                                    <p class="lead">
+                                        Mass: 1.9 x 10<sup>27</sup> Kg <br>
+                                        Diameter: 142984 Km <br>
+                                        Composition: Hydrogen - Helium - Methane - Ammonia
+
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Jupiter is the largest planet in the Solar System. It is the fifth planet from
+                                        the Sun. Jupiter is a gas giant, because it is so large and made of
+                                        gas.Jupiter's mass is about 318 times the mass of Earth. This is more than twice
+                                        the mass of all the other planets in the Solar System put together.
+                                        Jupiter can be seen even without using a telescope. The ancient Romans named the
+                                        planet after their King of Gods, Jupiter. <br><br>
+                                        Jupiter is the third brightest object
+                                        in the night sky. Only the Earth's moon and Venus are brighter. Jupiter has 79
+                                        moons. About 50 of them are very small. The four largest moons of Jupiter are
+                                        Io, Europa, Ganymede, and Callisto. Its diameter is larger than the planet
+                                        Mercury's.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050595944896417872/800px-Saturn_during_Equinox_28rot4529.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Saturn" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Saturn</h1>
+                                    <p class="lead">
+                                        Mass: 5.7 x 10<sup>26</sup> Kg <br>
+                                        Diameter: 120536 Km <br>
+                                        Composition: Hydrogen - Helium
+
+
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Saturn is the sixth planet from the Sun located in the Solar System. It is the
+                                        second largest planet in the Solar System, after Jupiter. Saturn is one of the
+                                        four gas giant planets, along with Jupiter, Uranus, and Neptune. <br><br>
+
+                                        Saturn is the English transliteration from the Latin word Saturnus, in Roman
+                                        religion, the god of sowing or seed. Saturn was named after the Roman god
+                                        Saturnus (called Kronos in Greek mythology). Inside Saturn is a core of iron,
+                                        nickel, silicon and oxygen compounds, surrounded by a deep layer of metallic
+                                        hydrogen, then a layer of liquid hydrogen and liquid helium and finally, an
+                                        outer gaseous layer. <br><br>
+
+                                        Saturn has 82 known moons orbiting the planet. 53 are officially named and 29
+                                        are waiting to be named. The largest moon is Titan, which is larger in volume
+                                        than the planet Mercury. Titan is the second-largest moon in the Solar System.
+                                        These rings are made of ice with smaller amounts of rocks and dust. Saturn is
+                                        about 1,433,000,000 Km on average from the Sun. Saturn takes 29.6 Earth years to
+                                        revolve around the Sun.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 right-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050596607881642004/800px-Uranus_as_seen_by_NASA27s_Voyager_2_28remastered29.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Uranus" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Uranus</h1>
+                                    <p class="lead">
+                                        Mass: 8.7 x 10<sup>25</sup> Kg <br>
+                                        Diameter: 51118 Km <br>
+                                        Composition: Hydrogen - Helium - Water - Ammonia - Methane.
+
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Uranus is the seventh planet from the Sun in our Solar System. Like Neptune, it
+                                        is an ice giant. It is the third largest planet in the solar system. The planet
+                                        is made of ice, gasses and liquid metal. Its atmosphere contains hydrogen (1H),
+                                        helium (2He) and methane. The temperature on Uranus is -197 °C. <br><br>
+
+                                        The planet is tilted on its axis so much that it is sideways. It has five big
+                                        moons, many small ones, and a small system of 13 planetary rings. The distance
+                                        between Uranus and the Sun is about 2.8 billion Km. Uranus completes its orbit
+                                        around the Sun in 84 earth years. It completes a spin around its axis in 17
+                                        hours and 14 minutes. <br><br>
+
+                                        Uranus was discovered in 1781. This planet can be seen with the naked eye under
+                                        perfect conditions. John Flamsteed saw it decades earlier but mistook it for a
+                                        star (34 Tauri).
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-2 left-2">
+                            <div class="card">
+                                <div class="bg-image hover-overlay ripple shadow-2-strong rounded-5"
+                                    data-mdb-ripple-color="light">
+                                    <img src="https://cdn.discordapp.com/attachments/881506146706395167/1050598271518777414/800px-Neptune_-_Voyager_2_282934798084529_flatten_crop.png"
+                                        class="img-fluid">
+                                    <a href="https://en.wikipedia.org/wiki/Neptune" target="_blank">
+                                        <div class="mask" style="background-color: rgba(251, 251, 251, 0.15);"></div>
+                                    </a>
+                                </div>
+                                <div class="card-body p-4">
+                                    <h1 class="fw-bold mb-4">Neptune</h1>
+                                    <p class="lead">
+                                        Mass: 1.02 x 10<sup>26</sup> Kg <br>
+                                        Diameter: 49528 Km <br>
+                                        Composition: Hydrogen - Helium - Hydrocarbons - Nitrogen Water Ice - Ammonia -
+                                        Methane.
+                                    </p>
+                                    <p class="mb-0 text-muted">
+                                        Neptune is the eighth and last planet from the Sun in the Solar System. It is an
+                                        ice giant. It is the fourth-largest planet in the system. Neptune has five
+                                        rings. These rings are hard to see from the Earth. <br><br>
+
+                                        Neptune has 17 times more mass than Earth and has a little bit more mass than
+                                        Uranus. Neptune is denser and physically smaller than Uranus. Its greater mass
+                                        causes more gravitational compression of its atmosphere. It was named after the
+                                        Roman god of the sea, Neptune. <br><br>
+
+                                        Neptune's atmosphere is mostly made up of hydrogen and helium. It also contains
+                                        small amounts of methane which makes the planet appear blue. Neptune also has
+                                        the strongest winds of any planet in the Solar System, as high as 2,100 Km/h or
+                                        1,300 mph. Astronomers Urbain Le Verrier and John Couch Adams discovered
+                                        Neptune. It was the first planet to be discovered by mathematical calculations
+                                        instead of a telescope. <br><br>
+
+                                        Neptune once had a huge storm known as the "Great Dark Spot". The storm was
+                                        discovered in 1989 by Voyager 2. The dark spot was not seen in 1994, and new
+                                        spots have been found since then. It is not known why the dark spot disappeared.
+                                        Visits by other space probes have been planned.
+
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <hr class="my-5">
+            <!--Footer-->
+            <footer class="text-center">
+                <p class="font-weight-light">Jl. Menteng Raya 64. Jakarta, Indonesia</p>
+            </footer>
+            <div id="google_translate_element" class="text-center"></div>
+            <!--Load Script-->
+            <!-- JavaScript Bundle with Popper -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+                crossorigin="anonymous"></script>
+            <script type="text/javascript"
+                src="https://mdbootstrap.com/api/snippets/static/download/MDB5-Free_6.0.1/js/mdb.min.js"></script>
+            <script type="text/javascript"
+                src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+            <script src="main.js"></script>
+            <script>
+                //Google translate API
+                function googleTranslateElementInit() {
+                    new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
+                }
+
+                /*Scroll up button implementation*/
+                //Get the button
+                let mybutton = document.getElementById("btn-back-to-top");
+
+                // When the user scrolls down 20px from the top of the document, show the button
+                window.onscroll = function () {
+                    scrollFunction();
+                };
+
+                function scrollFunction() {
+                    if (
+                        document.body.scrollTop > 20 ||
+                        document.documentElement.scrollTop > 20
+                    ) {
+                        mybutton.style.display = "block";
+                    } else {
+                        mybutton.style.display = "none";
+                    }
+                }
+                // When the user clicks on the button, scroll to the top of the document
+                mybutton.addEventListener("click", backToTop());
+
+                function backToTop() {
+                    document.body.scrollTop = 0;
+                    document.documentElement.scrollTop = 0;
+                }
+            </script>
 </body>
 
 </html>
