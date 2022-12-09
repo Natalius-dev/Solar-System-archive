@@ -170,7 +170,7 @@ function generateOrbit(body, centerX, centerY, count) {
         pathArray.push(pos);
     }
 
-    const orbitMesh = new THREE.Line(new THREE.BufferGeometry().setFromPoints( pathArray ), new THREE.LineBasicMaterial({color:"#fff",linewidth:10}) );
+    const orbitMesh = new THREE.Line(new THREE.BufferGeometry().setFromPoints( pathArray ), new THREE.LineBasicMaterial({color:"#fff",linewidth:1}) );
 
     if(showOrbits.showOrbits){
         scene.add(orbitMesh);
@@ -190,7 +190,7 @@ function addBody(texture, body) {
 
     interact.add(obj);
     obj.addEventListener('click', function(){
-        controlTarget = obj.position;
+        controlTarget.target = obj.position;
     });
 
     return obj;
@@ -199,17 +199,23 @@ function addBody(texture, body) {
 // ======================= 3D LOGIC =======================
 
 const scene = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 550000);
 const renderer = new THREE.WebGLRenderer({
-  canvas: document.getElementById("graphics")
+    canvas: document.getElementById("graphics")
 });
+const cam = new THREE.PerspectiveCamera(75, renderer.domElement.clientWidth/renderer.domElement.clientHeight, 0.1, 550000);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
+renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
+
+window.addEventListener('resize', function(){
+    cam.aspect = renderer.domElement.clientWidth/renderer.domElement.clientHeight;
+    cam.updateProjectionMatrix();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
+});
 
 const interact = new InteractionManager(renderer, cam, renderer.domElement);
 
-let controlTarget = new THREE.Vector3();
+let controlTarget = {target: new THREE.Vector3()};
 const controls = new OrbitControls(cam, renderer.domElement);
 
 cam.position.setZ(900);
@@ -220,9 +226,18 @@ scene.add(gridHelper);
 const axesHelper = new THREE.AxesHelper(50);
 scene.add( axesHelper );
 
-const skyboxMat = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")});
-skyboxMat.side = THREE.BackSide;
-scene.add(new THREE.Mesh(new THREE.BoxGeometry(500000,500000/2,500000), skyboxMat));
+const skyboxMat = [
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")}),
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")}),
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars2.jpg")}),
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars2.jpg")}),
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")}),
+    new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")})
+];
+for(let i = 0; i < skyboxMat.length; i++){
+    skyboxMat[i].side = THREE.BackSide;
+}
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(500000,500000/2,500000/2), skyboxMat));
 
 // BODY GENERATION
 
@@ -236,6 +251,7 @@ sunObj.material = new THREE.MeshBasicMaterial({map: sunTextureMap});
 const sunLight = new THREE.PointLight("#ffd782",1.5, 35000, 0.75);
 sunLight.position.copy(sunObj.position);
 scene.add(sunLight);
+controlTarget.target = sunObj.position;
 
 let orbitSpeed = 134.766507574;
 
@@ -403,13 +419,9 @@ function animate() {
     uranusOrbitIndex += speedControl.speedControl;
     neptuneOrbitIndex += speedControl.speedControl;
 
-    /*if(cam.position.distanceTo(controlTarget) > 100){
-        cam.position.lerp(controlTarget, 0.01);
-    }*/
-
     interact.update();
     controls.update();
-    controls.target.lerp(controlTarget, 0.1);
+    controls.target.lerp(controlTarget.target, 0.1);
 	renderer.render( scene, cam );
 }
 animate();
@@ -419,3 +431,15 @@ const gui = new GUI();
 gui.add(speedControl, 'speedControl', 0, 50, 1);
 gui.add(spinControl, 'spinControl', 0, 0.00003, 0.00000000001);
 gui.add(showOrbits, 'showOrbits');
+gui.add(controlTarget, 'target', {
+    "The Sun": sunObj.position,
+    "Mercury": mercuryObj.position,
+    "Venus": venusObj.position,
+    "Earth": earthObj.position,
+    "The Moon": moonObj.position,
+    "Jupiter": jupiterObj.position,
+    "Io": ioObj.position,
+    "Saturn": saturnObj.position,
+    "Uranus": uranusObj.position,
+    "Neptune": neptuneObj.position
+});
