@@ -274,17 +274,19 @@ function addBody(texture, body) {
 
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.getElementById("graphics")
+    canvas: document.getElementById("graphics"),
+    antialias: true
 });
 const cam = new THREE.PerspectiveCamera(75, renderer.domElement.clientWidth/renderer.domElement.clientHeight, 0.1, 550000);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
 
 window.addEventListener('resize', function(){
+    console.log("resized");
     cam.aspect = renderer.domElement.clientWidth/renderer.domElement.clientHeight;
     cam.updateProjectionMatrix();
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
+    renderer.setSize(renderer.domElement.clientWidth*2, renderer.domElement.clientHeight*2);
 });
 
 const interact = new InteractionManager(renderer, cam, renderer.domElement);
