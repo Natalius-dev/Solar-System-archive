@@ -282,7 +282,6 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
 
 window.addEventListener('resize', function(){
-    console.log("resized");
     cam.aspect = renderer.domElement.clientWidth/renderer.domElement.clientHeight;
     cam.updateProjectionMatrix();
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -296,11 +295,6 @@ const controls = new OrbitControls(cam, renderer.domElement);
 
 cam.position.setZ(900);
 cam.position.setY(500);
-
-const gridHelper = new THREE.GridHelper(100,10);
-scene.add(gridHelper);
-const axesHelper = new THREE.AxesHelper(50);
-scene.add( axesHelper );
 
 const skyboxMat = [
     new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load("textures/stars.jpg")}),
