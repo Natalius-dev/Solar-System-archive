@@ -219,7 +219,7 @@
 
 <body>
     <!--Main Navigation-->
-    <button type="button" class="btn btn-dark btn-floating btn-lg" id="btn-back-to-top">
+    <button type="button" class="btn btn-dark btn-floating btn-lg" id="btn-back-to-top" onclick="backToTop()">
         <i class="fas fa-arrow-up"></i>
     </button>
     <header>
@@ -238,10 +238,10 @@
                 <div class="collapse navbar-collapse" id="navbarExample01">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link" aria-current="page" href="#">Home</a>
+                            <a class="nav-link" aria-current="page" href="index.html">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="..." rel="nofollow" target="_blank">About</a>
+                            <a class="nav-link" href="about.html" rel="nofollow" target="_blank">About</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
@@ -249,8 +249,8 @@
                                 Projects
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" href="#">3D Model</a></li>
-                                <li><a class="dropdown-item" href="#">Documentation</a></li>
+                                <li><a class="dropdown-item" href="3D.html">3D Model</a></li>
+                                <li><a class="dropdown-item" href="#docs">Documentation</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -258,22 +258,7 @@
                     <ul class="navbar-nav d-flex flex-row">
                         <!-- Icons -->
                         <li class="nav-item me-3 me-lg-0">
-                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
-                                <i class="fab fa-youtube"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item me-3 me-lg-0">
-                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item me-3 me-lg-0">
-                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                        </li>
-                        <li class="nav-item me-3 me-lg-0">
-                            <a class="nav-link" href="..." rel="nofollow" target="_blank">
+                            <a class="nav-link" href="https://github.com/Natalius-dev/Solar-System" rel="nofollow" target="_blank">
                                 <i class="fab fa-github"></i>
                             </a>
                         </li>
@@ -800,40 +785,7 @@
                 src="https://mdbootstrap.com/api/snippets/static/download/MDB5-Free_6.0.1/js/mdb.min.js"></script>
             <script type="text/javascript"
                 src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-            <script src="main.js"></script>
-            <script>
-                //Google translate API
-                function googleTranslateElementInit() {
-                    new google.translate.TranslateElement({ pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element');
-                }
-
-                /*Scroll up button implementation*/
-                //Get the button
-                let mybutton = document.getElementById("btn-back-to-top");
-
-                // When the user scrolls down 20px from the top of the document, show the button
-                window.onscroll = function () {
-                    scrollFunction();
-                };
-
-                function scrollFunction() {
-                    if (
-                        document.body.scrollTop > 20 ||
-                        document.documentElement.scrollTop > 20
-                    ) {
-                        mybutton.style.display = "block";
-                    } else {
-                        mybutton.style.display = "none";
-                    }
-                }
-                // When the user clicks on the button, scroll to the top of the document
-                mybutton.addEventListener("click", backToTop());
-
-                function backToTop() {
-                    document.body.scrollTop = 0;
-                    document.documentElement.scrollTop = 0;
-                }
-            </script>
+            <script src="main.js" type="text/javascript"></script>
 </body>
 
 </html>
