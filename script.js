@@ -689,11 +689,11 @@ animate();
 // GUI
 const gui = new GUI( {autoPlace: false} );
 document.getElementById("dat.gui").append(gui.domElement);
-gui.add(speedControl, 'Orbit Speed', 0, 50, 1);
-gui.add(spinControl, 'Spin Speed', 0, 0.00003, 0.00000000001);
-gui.add(showOrbits, 'Show Orbits');
-gui.add(hideMoons, 'Show Moons');
-gui.add(hideMoons, 'Show Moon Orbits');
+gui.add(speedControl, 'Orbit Speed', 0, 50, 1).listen();
+gui.add(spinControl, 'Spin Speed', 0, 0.00003, 0.00000000001).listen();
+gui.add(showOrbits, 'Show Orbits').listen();
+gui.add(hideMoons, 'Show Moons').listen();
+gui.add(hideMoons, 'Show Moon Orbits').listen();
 gui.add(controlTarget, 'Camera Target', {
     "The Sun": sunObj.position,
     "Mercury": mercuryObj.position,
@@ -704,4 +704,14 @@ gui.add(controlTarget, 'Camera Target', {
     "Saturn": saturnObj.position,
     "Uranus": uranusObj.position,
     "Neptune": neptuneObj.position
-});
+}).listen();
+
+var resetSettings = { reset:function(){
+    speedControl["Orbit Speed"] = 1;
+    spinControl["Spin Speed"] = 0.00000083927;
+    showOrbits["Show Orbits"] = true;
+    hideMoons["Show Moons"] = true;
+    hideMoons["Show Moon Orbits"] = false;
+    controlTarget["Camera Target"] = sunObj.position;
+}};
+gui.add(resetSettings,'reset').name("Reset to Default Settings");
